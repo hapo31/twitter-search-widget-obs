@@ -1,23 +1,42 @@
 {
-  "name": "twitter-search-obs",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
+  "name": "twitter-search-widget-obs",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "start": "parcel ./src/index.html",
-    "build": "NODE_ENV=production parcel build ./src/index.html"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "format": "eslint --fix './src/**/*.{ts,tsx}' && eslint --fix './pages/*.{ts,tsx}'"
   },
   "devDependencies": {
+    "@types/isomorphic-fetch": "^0.0.35",
+    "@types/node": "^14.14.31",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
+    "@types/react-redux": "^7.1.16",
+    "@types/redux": "^3.6.0",
+    "@types/redux-thunk": "^2.1.0",
     "@types/styled-components": "^5.1.7",
-    "parcel": "^1.12.4",
+    "@typescript-eslint/eslint-plugin": "^4.15.2",
+    "@typescript-eslint/parser": "^4.15.2",
+    "babel-plugin-inline-react-svg": "^2.0.1",
+    "babel-plugin-react-svg": "^3.0.3",
+    "eslint": "^7.20.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react": "^7.22.0",
+    "prettier": "^2.2.1",
+    "ts-node": "^9.1.1",
     "typescript": "^4.1.5"
   },
   "dependencies": {
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "styled-components": "^5.2.1",
-    "twitter": "^1.7.1"
+    "isomorphic-fetch": "^3.0.0",
+    "next": "10.0.7",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "react-redux": "^7.2.2",
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0",
+    "styled-components": "^5.2.1"
   }
 }
