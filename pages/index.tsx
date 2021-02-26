@@ -15,14 +15,23 @@ const Container = styled.main`
   background-color: white;
   width: 1200px;
   height: 200px;
-  border: solid 2px #1d98f0;
-  border-radius: 16px;
+  border: solid 4px #1d98f0;
+  border-radius: 90px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+
   display: flex;
   justify-content: flex-start;
 `;
 
 const LogoContainer = styled.div`
   width: 200px;
+  margin: -2px;
+  border-radius: 90px;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+
   background-color: #1d98f0;
   display: flex;
   flex-direction: column;
