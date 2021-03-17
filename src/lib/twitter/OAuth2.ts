@@ -1,4 +1,5 @@
 import fetch from "isomorphic-fetch";
+import { Oauth2ResultResponse } from "../../../@types/twitter";
 import { TwitterDomain } from "./api";
 import encode64 from "./Base64";
 export async function OAuth2(consumerKey: string, consumerSecret: string) {
@@ -17,5 +18,7 @@ export async function OAuth2(consumerKey: string, consumerSecret: string) {
     body,
   });
 
-  return await res.json();
+  const json: Oauth2ResultResponse = await res.json();
+
+  return { token: json.access_token };
 }

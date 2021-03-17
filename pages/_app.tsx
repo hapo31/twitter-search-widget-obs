@@ -1,4 +1,6 @@
-import { ComponentClass } from "react";
+import React, { ComponentClass } from "react";
+import { Provider } from "react-redux";
+import { rootStore } from "../src/store/root";
 
 function MyApp({
   Component,
@@ -7,7 +9,11 @@ function MyApp({
   Component: ComponentClass;
   pageProps: Record<string, unknown>;
 }) {
-  return <Component {...pageProps} />;
+  return (
+    <Provider store={rootStore}>
+      <Component {...pageProps} />;
+    </Provider>
+  );
 }
 
 export default MyApp;
