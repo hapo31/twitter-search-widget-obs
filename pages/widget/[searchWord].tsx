@@ -59,7 +59,7 @@ export default function TwitterHashtag(props: Props) {
                   .filter((tweet, i) => i === currentTweet % twitter.tweets.length)
                   .map((tweet) => (
                     <FadeInFromRight key={`tweet-${tweet.id}`} time={2}>
-                      <div>{tweet.text.replaceAll(/#[^\s]+\s/g, "")}</div>
+                      <div>{tweet.text.replaceAll(/#[^\s]+\s?/g, "")}</div>
                       <div style={{ fontSize: 20 }}>by {tweet.name}</div>
                     </FadeInFromRight>
                   ))
