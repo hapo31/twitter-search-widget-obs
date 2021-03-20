@@ -1,6 +1,7 @@
 export type Tweet = {
+  text: string;
   name: string;
-  screen_name: string;
+  screenName: string;
   id: string;
   createdAt: Date;
   profileImg: string;
@@ -8,5 +9,6 @@ export type Tweet = {
 
 export type TwitterState = {
   token?: string;
+  sinceId?: string;
   tweets: Tweet[];
 };

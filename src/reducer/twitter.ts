@@ -5,13 +5,11 @@ const initialState: TwitterState = {
   tweets: [],
 };
 
-export function twitterReducer(
-  state = initialState,
-  action: TwitterActions
-): TwitterState {
+export function twitterReducer(state = initialState, action: TwitterActions): TwitterState {
   switch (action.type) {
     case STORE_TOKEN: {
       return {
+        ...state,
         tweets: [],
         token: action.payload.token,
       };
