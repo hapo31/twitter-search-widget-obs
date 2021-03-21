@@ -6,7 +6,7 @@ import { Tweet } from "../store/twitter";
 type TwitterThunkAction = ThunkAction<void, RootState, void, TwitterActions>;
 
 export const STORE_TOKEN = "TWITTER/STORE_TOKEN" as const;
-export const FETCH_TWEETS = "TWITTER/FETCH_TWEETS" as const;
+export const SEARCH_TWEETS = "TWITTER/SEARCH_TWEETS" as const;
 
 export const storeToken = (token: string) => ({
   type: STORE_TOKEN,
@@ -22,7 +22,7 @@ export const appAuthThunk = (): TwitterThunkAction => {
 };
 
 const searchTweets = (tweets: Tweet[], sinceId: string) => ({
-  type: FETCH_TWEETS,
+  type: SEARCH_TWEETS,
   payload: { tweets, sinceId },
 });
 
@@ -43,7 +43,7 @@ export const searchTweetsThunk = (searchWord: string, excludeRT?: boolean, until
           ({
             text: status.full_text,
             createdAt: new Date(status.created_at),
-            id: status.id_str,
+            id: status.id,
             screenName: status.user.screen_name,
             name: status.user.name,
             profileImg: status.user.profile_image_url_https,

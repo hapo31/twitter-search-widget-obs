@@ -2,7 +2,7 @@ export type Tweet = {
   text: string;
   name: string;
   screenName: string;
-  id: string;
+  id: number;
   createdAt: Date;
   profileImg: string;
 };
