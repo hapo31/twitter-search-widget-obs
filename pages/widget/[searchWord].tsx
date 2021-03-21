@@ -29,12 +29,16 @@ export default function TwitterHashtag(props: Props) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (twitter.token) {
+    if (token != null && twitter.token) {
+      // ローカルストレージにもステートにもトークンがある
       return;
-    } else if (token != null && !twitter.token) {
+      // ローカルストレージだけにある
+    } else if (twitter.token == null && token != null) {
       dispatch(storeToken(token));
-    } else if (!token && twitter.token != null) {
+      // ローカルストレージにない
+    } else if (twitter.token != null && token == null) {
       localStorage.setItem("token", twitter.token);
+      // どこにもない
     } else {
       dispatch(appAuthThunk());
     }
