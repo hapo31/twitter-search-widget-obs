@@ -8,6 +8,7 @@ import { RootState } from "../../src/store/root";
 
 type Props = {
   searchWord?: string;
+  token?: string;
 };
 
 export default function TwitterHashtag(props: Props) {
@@ -34,6 +35,8 @@ export default function TwitterHashtag(props: Props) {
     if (token == null) {
       if (localStorageToken != null) {
         dispatch(storeToken(localStorageToken));
+      } else if (props.token != null) {
+        dispatch(storeToken(props.token));
       } else {
         dispatch(appAuthThunk());
       }
@@ -76,9 +79,11 @@ export default function TwitterHashtag(props: Props) {
 
 export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
   const searchWord = context.query["searchWord"] as string;
+  const token = context.params?.["token"] as string;
   return {
     props: {
       searchWord: searchWord ?? null,
+      token: token ?? null,
     },
   };
 };
