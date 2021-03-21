@@ -16,6 +16,8 @@ export default function TwitterHashtag(props: Props) {
     twitter,
   }));
 
+  const { token, tweets } = twitter;
+
   const [currentTweet, setCurrentTweet] = useState(0);
   const timerRef = useRef(0);
 
@@ -25,30 +27,21 @@ export default function TwitterHashtag(props: Props) {
         setCurrentTweet((currentTweet) => currentTweet + 1);
       }, 10000);
     }
-  }, [twitter.tweets]);
+  }, [tweets]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token != null && twitter.token) {
-      // ローカルストレージにもステートにもトークンがある
-      return;
-      // ローカルストレージだけにある
-    } else if (twitter.token == null && token != null) {
-      dispatch(storeToken(token));
-      // ローカルストレージにない
-    } else if (twitter.token != null && token == null) {
-      localStorage.setItem("token", twitter.token);
-      // どこにもない
-    } else {
-      dispatch(appAuthThunk());
-    }
-  }, [twitter.token]);
-
-  useEffect(() => {
-    if (props.searchWord) {
+    const localStorageToken = localStorage.getItem("token");
+    if (token == null) {
+      if (localStorageToken != null) {
+        dispatch(storeToken(localStorageToken));
+      } else {
+        dispatch(appAuthThunk());
+      }
+    } else if (props.searchWord) {
+      localStorage.setItem("token", token);
       dispatch(searchTweetsThunk("#" + props.searchWord, true));
     }
-  }, []);
+  }, [token]);
 
   return (
     <>
@@ -58,13 +51,18 @@ export default function TwitterHashtag(props: Props) {
         </LogoContainer>
         <ContentContainer>
           <Tweet>
-            {twitter.tweets.length >= 1
-              ? twitter.tweets
-                  .filter((tweet, i) => i === currentTweet % twitter.tweets.length)
+            {tweets.length >= 1
+              ? tweets
+                  .filter((tweet, i) => i === currentTweet % tweets.length)
                   .map((tweet) => (
                     <FadeInFromRight key={`tweet-${tweet.id}`} time={2}>
                       <div>{tweet.text.replaceAll(/#[^\s]+\s?/g, "")}</div>
-                      <div style={{ fontSize: 20 }}>by {tweet.name}</div>
+                      <Author>
+                        by{" "}
+                        <Name>
+                          {tweet.name} @{tweet.screenName}
+                        </Name>
+                      </Author>
                     </FadeInFromRight>
                   ))
               : null}
@@ -90,9 +88,7 @@ const Container = styled.main`
   width: 98vw;
   height: 200px;
   border: solid 3px #1d98f0;
-  border-radius: 90px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+  border-top-left-radius: 90px;
 
   display: flex;
   justify-content: flex-start;
@@ -132,7 +128,7 @@ const ContentContainer = styled.div`
 `;
 
 const Tweet = styled.div`
-  margin: 10px;
+  padding: 10px;
   font-size: 48px;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -150,4 +146,14 @@ const HashTag = styled.div`
   background-color: #1d98f0;
   white-space: nowrap;
   color: #efefef;
+`;
+
+const Author = styled.div`
+  font-size: 16px;
+`;
+
+const Name = styled.span`
+  font-size: 20px;
+  font-weight: bold;
+  color: #1d98f0;
 `;
