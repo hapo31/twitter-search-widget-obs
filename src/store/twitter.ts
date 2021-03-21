@@ -8,7 +8,7 @@ export type Tweet = {
 };
 
 export type TwitterState = {
-  token?: string;
+  token: string | null;
   sinceId?: string;
   tweets: Tweet[];
 };

@@ -3,6 +3,7 @@ import { TwitterState } from "../store/twitter";
 
 const initialState: TwitterState = {
   tweets: [],
+  token: null,
 };
 
 export function twitterReducer(state = initialState, action: TwitterActions): TwitterState {
