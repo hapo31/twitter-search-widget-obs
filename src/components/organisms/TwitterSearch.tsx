@@ -100,6 +100,7 @@ const ContentContainer = styled.div`
 
 const TweetContainer = styled.div`
   padding: 10px;
+  color: #000;
   font-size: 48px;
   white-space: nowrap;
   text-overflow: ellipsis;
