@@ -8,11 +8,7 @@ class AppDocument extends Document {
 
   render() {
     return (
-      <Html
-        style={{
-          overflow: "hidden",
-        }}
-      >
+      <Html>
         <Head>
           <link rel="dns-prefetch" href="//www.google.co.jp" />
         </Head>
