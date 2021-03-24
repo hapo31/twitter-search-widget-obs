@@ -10,11 +10,12 @@ export async function oauth() {
 export async function searchTweets(
   token: string,
   searchWord: string,
+  count: number,
   sinceId?: string,
   until?: Date,
   excludeRT?: boolean
 ) {
-  const q = QueryString({ token, searchWord, sinceId, until, excludeRT });
+  const q = QueryString({ token, searchWord, sinceId, until, excludeRT, count });
   const res = await fetch(`/api/search_tweet?${q}`);
 
   const json = (await res.json()) as SearchResultResponse;

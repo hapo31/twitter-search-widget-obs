@@ -1,4 +1,4 @@
-import { STORE_TOKEN, SEARCH_TWEETS, TwitterActions } from "../actions/twitter";
+import { STORE_TOKEN, STORE_TWEETS, TwitterActions } from "../actions/twitter";
 import { TwitterState } from "../store/twitter";
 
 const initialState: TwitterState = {
@@ -16,13 +16,15 @@ export function twitterReducer(state = initialState, action: TwitterActions): Tw
       };
     }
 
-    case SEARCH_TWEETS: {
+    case STORE_TWEETS: {
       action.payload.tweets.sort((a, b) => {
         return a.id - b.id;
       });
       return {
         ...state,
-        tweets: state.tweets.concat(...action.payload.tweets),
+        tweets: action.payload.tweets,
+        sinceId: action.payload.sinceId ?? state.sinceId,
+        lastSearchDate: action.payload.lastSearchDate ?? state.lastSearchDate,
       };
     }
   }

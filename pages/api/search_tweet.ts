@@ -9,6 +9,7 @@ export type SearchTweetRequestParam = {
   until?: number;
   sinceId?: string;
   excludeRT?: boolean;
+  count?: number;
 };
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -20,10 +21,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
 
-  const searchWord =
-    param.searchWord + " exclude:nativeretweets" + " exclude:replies" + param.sinceId
-      ? `since_id:${param.sinceId}`
-      : "";
+  const searchWord = param.searchWord + " exclude:nativeretweets" + " exclude:replies";
   if (!searchWord) {
     res.status(400).json({ error: "'searchWord' required." });
     return;
@@ -34,11 +32,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     ? `${until.getFullYear()}-${padding(`${until.getMonth() + 1}`, "0", 2)}-${padding(`${until.getDate()}`, "0", 2)}`
     : null;
 
+  const count = param.count ?? 15;
+
   const queryString = QueryString({
     q: param.searchWord,
     until: untilDateStr,
     modules: "status",
     tweet_mode: "extended",
+    since_id: param.sinceId,
+    count,
   });
 
   const response = await fetch(`${TwitterDomain}/1.1/search/tweets.json?${queryString}`, {
