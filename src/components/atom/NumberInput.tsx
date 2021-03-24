@@ -2,12 +2,12 @@ import { ChangeEvent, CSSProperties, useCallback } from "react";
 
 type Props = {
   onChange: (value: string) => void;
-  value: string | number;
+  value?: string | number;
   placeholder?: string;
   style?: CSSProperties;
 };
 
-export const TextInput = (props: Props) => {
+export const NumberInput = (props: Props) => {
   const onChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const target = event.target;
