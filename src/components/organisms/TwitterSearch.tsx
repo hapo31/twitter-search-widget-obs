@@ -35,7 +35,7 @@ export const TwitterSearch = (props: Props) => {
           <TweetContainer>
             <FadeInFromRight play={isPlay} time={fadeInTimeSec} delay={0}>
               <div>{tweet.text.replace(/#[^\s]+\s?/g, "")}</div>
-              {showAuthor ? (
+              {showAuthor && tweet.screenName.length !== 0 ? (
                 <FadeInFromRight play={true} time={fadeInTimeSec} delay={0}>
                   <Author>
                     by{" "}
