@@ -2,7 +2,7 @@ import { ChangeEvent, CSSProperties, useCallback } from "react";
 
 type Props = {
   onChange: (value: string) => void;
-  value: string | number;
+  value?: string | number;
   placeholder?: string;
   style?: CSSProperties;
 };
