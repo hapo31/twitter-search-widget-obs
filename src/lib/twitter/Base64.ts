@@ -29,12 +29,7 @@ export default function encode64(input: any) {
     enc4 = chr3 & 63;
     if (isNaN(chr2)) enc3 = enc4 = 64;
     else if (isNaN(chr3)) enc4 = 64;
-    output =
-      output +
-      key.charAt(enc1) +
-      key.charAt(enc2) +
-      key.charAt(enc3) +
-      key.charAt(enc4);
+    output = output + key.charAt(enc1) + key.charAt(enc2) + key.charAt(enc3) + key.charAt(enc4);
   }
   return output;
 }

@@ -1,5 +1,5 @@
 import { PureComponent } from "react";
-import { Empty } from "../util/twitter";
+import { Empty } from "../util";
 
 module "*.svg" {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
