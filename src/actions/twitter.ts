@@ -46,7 +46,6 @@ export const searchTweetsThunk = (
     console.log(`lastSearchDate:${state.lastSearchDate?.toLocaleTimeString()} `);
     // 前回の取得から1分経っていなければ取得処理は行わない
     if (state.lastSearchDate != null && Date.now() - state.lastSearchDate.getTime() < 60 * 1000) {
-      dispatch(updateLastSearchDate(new Date()));
       console.log(`search was skipped.`);
       return;
     }
@@ -58,6 +57,7 @@ export const searchTweetsThunk = (
 
     const res = await reqSearchTweets(token, searchWord, count, state.sinceId, until, excludeRT);
     if (res.statuses.length === 0) {
+      dispatch(updateLastSearchDate(new Date()));
       console.log("tweets not found");
       return;
     }
