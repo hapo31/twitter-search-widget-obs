@@ -8,6 +8,8 @@ type TwitterThunkAction = ThunkAction<void, RootState, void, TwitterActions>;
 export const STORE_TOKEN = "TWITTER/STORE_TOKEN" as const;
 export const STORE_TWEETS = "TWITTER/STORE_TWEETS" as const;
 
+export const UPDATE_LAST_SEARCH_DATE = "TWITTER/UPDATE_LAST_SEARCH_DATE" as const;
+
 export const storeToken = (token: string) => ({
   type: STORE_TOKEN,
   payload: { token },
@@ -20,6 +22,13 @@ export const appAuthThunk = (): TwitterThunkAction => {
     dispatch(storeToken(res.token));
   };
 };
+
+export const updateLastSearchDate = (date: Date) => ({
+  type: UPDATE_LAST_SEARCH_DATE,
+  payload: {
+    date,
+  },
+});
 
 export const storeTweets = (tweets: Tweet[], sinceId?: string, lastSearchDate?: Date) => ({
   type: STORE_TWEETS,
@@ -37,6 +46,7 @@ export const searchTweetsThunk = (
     console.log(`lastSearchDate:${state.lastSearchDate?.toLocaleTimeString()} `);
     // 前回の取得から1分経っていなければ取得処理は行わない
     if (state.lastSearchDate != null && Date.now() - state.lastSearchDate.getTime() < 60 * 1000) {
+      dispatch(updateLastSearchDate(new Date()));
       console.log(`search was skipped.`);
       return;
     }
@@ -73,4 +83,4 @@ export const searchTweetsThunk = (
   };
 };
 
-export type TwitterActions = ReturnType<typeof storeToken | typeof storeTweets>;
+export type TwitterActions = ReturnType<typeof storeToken | typeof storeTweets | typeof updateLastSearchDate>;
