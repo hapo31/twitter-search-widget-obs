@@ -1,15 +1,18 @@
 import { GetServerSideProps } from "next";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { appAuthThunk, searchTweetsThunk, storeToken } from "../../src/actions/twitter";
+import { searchTweetsThunk, storeToken, storeTweets } from "../../src/actions/twitter";
 import { TwitterSearch } from "../../src/components/organisms/TwitterSearch";
 import { ERR_REQUIRE_TOKEN } from "../../src/constants/error";
 import { RootState } from "../../src/store/root";
+import { Tweet } from "../../src/store/twitter";
 
 type Props = {
   searchWord?: string;
   token?: string;
   transition: number;
+  count: number;
+  tweetChangeInterval: number;
 };
 
 export default function TwitterHashtag(props: Props) {
@@ -20,7 +23,14 @@ export default function TwitterHashtag(props: Props) {
 
   const { token, tweets } = twitter;
 
-  const [currentTweet, setCurrentTweet] = useState(0);
+  const [showTweet, setShowTweet] = useState<Tweet>({
+    createdAt: new Date(),
+    id: "0",
+    name: "",
+    profileImg: "",
+    screenName: "",
+    text: "",
+  });
   const [error, setError] = useState(0);
   const timerRef = useRef(0);
 
@@ -28,9 +38,27 @@ export default function TwitterHashtag(props: Props) {
     if (timerRef.current !== 0) {
       window.clearInterval(timerRef.current);
     }
+    if (showTweet.id === "0" && tweets.length > 0) {
+      const newShowTweet = tweets.shift();
+      if (newShowTweet) {
+        dispatch(storeTweets([...tweets]));
+        setShowTweet(newShowTweet);
+      }
+    }
     timerRef.current = window.setInterval(() => {
-      setCurrentTweet((currentTweet) => (currentTweet = (currentTweet + 1) % tweets.length));
-    }, 10000);
+      if (tweets.length <= 1) {
+        dispatch(searchTweetsThunk("#" + props.searchWord, props.count, true));
+        if (tweets.length === 0) {
+          return;
+        }
+      }
+
+      const newShowTweet = tweets.shift();
+      if (newShowTweet) {
+        dispatch(storeTweets([...tweets]));
+        setShowTweet(newShowTweet);
+      }
+    }, props.tweetChangeInterval * 1000);
 
     return () => {
       if (timerRef.current !== 0) {
@@ -40,18 +68,15 @@ export default function TwitterHashtag(props: Props) {
   }, [tweets]);
 
   useEffect(() => {
-    const localStorageToken = localStorage.getItem("token");
     if (token == null) {
-      if (localStorageToken != null) {
-        dispatch(storeToken(localStorageToken));
-      } else if (props.token != null) {
+      if (props.token != null) {
         dispatch(storeToken(props.token));
       } else {
         setError(ERR_REQUIRE_TOKEN);
       }
     } else if (props.searchWord) {
       localStorage.setItem("token", token);
-      dispatch(searchTweetsThunk("#" + props.searchWord, true));
+      dispatch(searchTweetsThunk("#" + props.searchWord, props.count, true));
     }
   }, [token]);
 
@@ -60,20 +85,25 @@ export default function TwitterHashtag(props: Props) {
     html[0].style.overflow = "hidden";
   }, []);
 
-  return tweets[currentTweet] ? (
-    <TwitterSearch searchWord={props.searchWord ?? ""} tweet={tweets[currentTweet]} fadeInTimeSec={props.transition} />
+  return showTweet ? (
+    <TwitterSearch searchWord={props.searchWord ?? ""} tweet={showTweet} fadeInTimeSec={props.transition} />
   ) : null;
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
-  const searchWord = context.query["searchWord"] as string;
-  const token = context.params?.["token"] as string;
-  const transition = context.params?.["token"] as string;
+  const searchWord = context.params?.["searchWord"] as string;
+  const token = context.query?.["token"] as string;
+  const transition = context.query?.["token"] as string;
+  const count = context.query?.["count"] as string;
+  const tweetChangeInterval = context.query?.["tweetChangeInterval"] as string;
+
   return {
     props: {
       searchWord: searchWord ?? null,
       token: token ?? null,
       transition: transition ? parseInt(transition) : 2,
+      count: count ? parseInt(count) : 15,
+      tweetChangeInterval: tweetChangeInterval ? parseInt(tweetChangeInterval) : 10,
     },
   };
 };
