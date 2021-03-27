@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { NumberInput } from "../src/components/atom/NumberInput";
-import { TextInput } from "../src/components/atom/TextInput";
+import { Form } from "../src/components/atom/Form";
+import { NumberInput } from "../src/components/molecules/NumberInput";
+import { TextInput } from "../src/components/molecules/TextInput";
 import { TwitterSearch } from "../src/components/organisms/TwitterSearch";
 import { oauth } from "../src/service/twitter";
 import { QueryString } from "../src/util/util";
@@ -13,12 +14,12 @@ type Preference = {
   transition: number;
   tweetChangeInterval: number;
   token: string;
+  searchWord: string;
 };
 
 export default function Index(props: Props) {
   const [preference, setPreference] = useState<Preference>({} as any);
-  const [url, setUrl] = useState("");
-  const [searchWord, setSearchWord] = useState("");
+  const [copied, setCopied] = useState(false);
   const [firstView, setFirstView] = useState(true);
   const [showTweet, setShowTweet] = useState({
     createdAt: new Date(),
@@ -27,6 +28,7 @@ export default function Index(props: Props) {
     profileImg: "",
     screenName: "test_taro",
     text: "テストツイートテストツイートテストツイート",
+    token: "",
   });
 
   const timerRef = useRef(0);
@@ -41,20 +43,25 @@ export default function Index(props: Props) {
         transition: 2,
         tweetChangeInterval: 10,
         token: "",
+        searchWord: "",
       });
     }
 
     setFirstView(false);
   }, []);
 
-  const withSavePreference = useCallback(
-    (onChange: (value: string) => void) => {
+  const onChangeValue = useCallback(
+    (name: string, value: string) => {
       if (!firstView) {
-        localStorage.setItem("preference", JSON.stringify(preference));
+        const newPreference = {
+          ...preference,
+          [name]: value,
+        };
+        localStorage.setItem("preference", JSON.stringify(newPreference));
+        setPreference(newPreference);
       }
-      return (value: string) => onChange(value);
     },
-    [preference]
+    [preference, firstView]
   );
 
   useEffect(() => {
@@ -69,6 +76,7 @@ export default function Index(props: Props) {
         profileImg: "",
         screenName: "test_taro",
         text: "テストツイートテストツイートテストツイート",
+        token: "",
       });
     }, preference.tweetChangeInterval * 1000);
 
@@ -82,82 +90,64 @@ export default function Index(props: Props) {
     <>
       <Container>
         <H1>Twitter の #ハッシュタグ が順番に流れてくるやつ</H1>
-        <Body>
-          <p>
-            <Text>検索ハッシュタグ </Text>
-            #
-            <TextInput
-              value={searchWord}
-              onChange={(v) => {
-                setSearchWord(v);
-              }}
-            />
-          </p>
-          <p>
-            <Text>最大取得件数</Text>
-            <NumberInput
-              value={preference?.count}
-              onChange={withSavePreference((v) => {
-                if (preference) {
-                  setPreference({
-                    ...preference,
-                    count: parseInt(v),
-                  });
-                }
-              })}
-            />
-          </p>
-          <p>
-            <Text>フェードイン秒数</Text>
-            <NumberInput
-              value={preference?.transition}
-              onChange={withSavePreference((v) => {
-                if (preference) {
-                  setPreference({
-                    ...preference,
-                    transition: parseInt(v),
-                  });
-                }
-              })}
-            />
-          </p>
-          <p>
-            <Text>ツイートの表示更新間隔</Text>
-            <NumberInput
-              value={preference?.tweetChangeInterval}
-              onChange={withSavePreference((v) => {
-                if (preference) {
-                  setPreference({
-                    ...preference,
-                    tweetChangeInterval: parseInt(v),
-                  });
-                }
-              })}
-            />
-          </p>
-          <p>
-            <button
-              onClick={async () => {
-                const word = encodeURI(searchWord);
-                if (preference.token === "") {
-                  const { token } = await oauth();
-                  setPreference({ ...preference, token });
-                  withSavePreference(() => {
-                    /* */
-                  });
-                }
+        {!firstView ? (
+          <Body>
+            <Form onChangedValue={onChangeValue}>
+              <p>
+                <Text>検索ハッシュタグ</Text>
+                #
+                <TextInput name="searchWord" defaultValue={preference.searchWord} />
+              </p>
+              <p>
+                <Text>最大取得件数</Text>
+                <NumberInput name="count" defaultValue={preference.count} />
+              </p>
+              <p>
+                <Text>フェードイン秒数</Text>
+                <NumberInput name="transition" defaultValue={preference.transition} />
+              </p>
+              <p>
+                <Text>ツイートの表示更新間隔</Text>
+                <NumberInput name="tweetChangeInterval" defaultValue={preference.tweetChangeInterval} />
+              </p>
+            </Form>
+            <p>
+              <button
+                onClick={async () => {
+                  const word = encodeURI(preference.searchWord);
+                  let newPreference = preference;
+                  if (!preference.token) {
+                    const { token } = await oauth();
+                    newPreference = { ...preference, token };
+                    setPreference(newPreference);
+                  }
+                  const url = `https://${location.host}/widget/${word}?${QueryString({
+                    count: newPreference.count,
+                    transition: newPreference.transition,
+                    tweetChangeInterval: newPreference.tweetChangeInterval,
+                    token: newPreference.token,
+                  })}`;
 
-                setUrl(`https://${location.host}/widget/${word}?${QueryString(preference)}`);
-              }}
-            >
-              URL生成
-            </button>
-            {url}
-          </p>
-        </Body>
+                  if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(url);
+                    if (!copied) {
+                      setCopied(true);
+                      setTimeout(() => {
+                        setCopied(false);
+                      }, 3000);
+                    }
+                  }
+                }}
+              >
+                URLをコピー
+              </button>
+              <TextCopied className={copied ? "show" : ""}>☑ クリップボードにURLをコピーしました！</TextCopied>
+            </p>
+          </Body>
+        ) : null}
       </Container>
       <Preview>
-        <TwitterSearch tweet={showTweet} fadeInTimeSec={preference.transition} searchWord={searchWord} />
+        <TwitterSearch tweet={showTweet} fadeInTimeSec={preference.transition} searchWord={preference.searchWord} />
       </Preview>
     </>
   );
@@ -194,4 +184,13 @@ const Preview = styled.div`
   padding-top: 20px;
   background-color: white;
   width: 100%;
+`;
+
+const TextCopied = styled.span`
+  color: #009c2f;
+  transition: 3s;
+  visibility: hidden;
+  &.show {
+    visibility: visible;
+  }
 `;

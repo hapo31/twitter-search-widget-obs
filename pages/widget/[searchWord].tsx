@@ -93,7 +93,7 @@ export default function TwitterHashtag(props: Props) {
 export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
   const searchWord = context.params?.["searchWord"] as string;
   const token = context.query?.["token"] as string;
-  const transition = context.query?.["token"] as string;
+  const transition = context.query?.["transition"] as string;
   const count = context.query?.["count"] as string;
   const tweetChangeInterval = context.query?.["tweetChangeInterval"] as string;
 
