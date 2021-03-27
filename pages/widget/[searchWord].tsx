@@ -23,6 +23,8 @@ export default function TwitterHashtag(props: Props) {
 
   const { token, tweets } = twitter;
 
+  const tweetChangeInterval = props.tweetChangeInterval >= 10 ? props.tweetChangeInterval : 10;
+
   const [showTweet, setShowTweet] = useState<Tweet>({
     createdAt: new Date(),
     id: "0",
@@ -58,7 +60,7 @@ export default function TwitterHashtag(props: Props) {
         dispatch(storeTweets([...tweets]));
         setShowTweet(newShowTweet);
       }
-    }, props.tweetChangeInterval * 1000);
+    }, tweetChangeInterval * 1000);
 
     return () => {
       if (timerRef.current !== 0) {
