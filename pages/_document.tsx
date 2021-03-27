@@ -12,7 +12,11 @@ class AppDocument extends Document {
         <Head>
           <link rel="dns-prefetch" href="//www.google.co.jp" />
         </Head>
-        <body>
+        <body
+          style={{
+            margin: "0",
+          }}
+        >
           <Main />
           <NextScript />
         </body>

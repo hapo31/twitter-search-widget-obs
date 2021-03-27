@@ -7,7 +7,9 @@ import { TwitterSearch } from "../src/components/organisms/TwitterSearch";
 import { oauth } from "../src/service/twitter";
 import { QueryString } from "../src/util/util";
 
-type Props = {};
+type Props = {
+  noneval: unknown;
+};
 
 type Preference = {
   count: number;
@@ -33,6 +35,49 @@ export default function Index(props: Props) {
 
   const timerRef = useRef(0);
 
+  const onChangeValue = useCallback(
+    (name: string, value: string) => {
+      if (!firstView) {
+        const newPreference = {
+          ...preference,
+          [name]: value,
+        };
+        localStorage.setItem("preference", JSON.stringify(newPreference));
+        setPreference(newPreference);
+      }
+    },
+    [preference, firstView]
+  );
+
+  const onClickButton = useCallback(async () => {
+    const word = encodeURI(preference.searchWord);
+    let newPreference = preference;
+    if (!preference.token) {
+      const { token } = await oauth();
+      newPreference = { ...preference, token };
+      setPreference(newPreference);
+    }
+    const url = `https://${location.host}/widget/${word}?${QueryString({
+      count: newPreference.count,
+      transition: newPreference.transition,
+      tweetChangeInterval: newPreference.tweetChangeInterval,
+      token: newPreference.token,
+    })}`;
+
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(url);
+      setCopied((copied) => {
+        if (!copied) {
+          setCopied(true);
+          setTimeout(() => {
+            setCopied(false);
+          }, 3000);
+        }
+        return copied;
+      });
+    }
+  }, [preference]);
+
   useEffect(() => {
     const storagePreference = localStorage.getItem("preference");
     if (storagePreference) {
@@ -49,20 +94,6 @@ export default function Index(props: Props) {
 
     setFirstView(false);
   }, []);
-
-  const onChangeValue = useCallback(
-    (name: string, value: string) => {
-      if (!firstView) {
-        const newPreference = {
-          ...preference,
-          [name]: value,
-        };
-        localStorage.setItem("preference", JSON.stringify(newPreference));
-        setPreference(newPreference);
-      }
-    },
-    [preference, firstView]
-  );
 
   useEffect(() => {
     if (timerRef.current !== 0) {
@@ -93,56 +124,29 @@ export default function Index(props: Props) {
         {!firstView ? (
           <Body>
             <Form onChangedValue={onChangeValue}>
-              <p>
+              <FormItem>
                 <Text>検索ハッシュタグ</Text>
-                #
+                <Hash />
                 <TextInput name="searchWord" defaultValue={preference.searchWord} />
-              </p>
-              <p>
+              </FormItem>
+              <FormItem>
                 <Text>最大取得件数</Text>
                 <NumberInput name="count" defaultValue={preference.count} />
-              </p>
-              <p>
+              </FormItem>
+              <FormItem>
                 <Text>フェードイン秒数</Text>
                 <NumberInput name="transition" defaultValue={preference.transition} />
-              </p>
-              <p>
-                <Text>ツイートの表示更新間隔(最低10秒、それ以下を指定しても10秒になります)</Text>
+              </FormItem>
+              <FormItem>
+                <Text>ツイートの表示更新間隔</Text>
+                <SmallText>(最低10秒、それ以下を指定しても10秒になります)</SmallText>
                 <NumberInput name="tweetChangeInterval" defaultValue={preference.tweetChangeInterval} />
-              </p>
+              </FormItem>
             </Form>
-            <p>
-              <button
-                onClick={async () => {
-                  const word = encodeURI(preference.searchWord);
-                  let newPreference = preference;
-                  if (!preference.token) {
-                    const { token } = await oauth();
-                    newPreference = { ...preference, token };
-                    setPreference(newPreference);
-                  }
-                  const url = `https://${location.host}/widget/${word}?${QueryString({
-                    count: newPreference.count,
-                    transition: newPreference.transition,
-                    tweetChangeInterval: newPreference.tweetChangeInterval,
-                    token: newPreference.token,
-                  })}`;
-
-                  if (navigator.clipboard) {
-                    await navigator.clipboard.writeText(url);
-                    if (!copied) {
-                      setCopied(true);
-                      setTimeout(() => {
-                        setCopied(false);
-                      }, 3000);
-                    }
-                  }
-                }}
-              >
-                URLをコピー
-              </button>
+            <CopyButtonWrapper>
+              <button onClick={onClickButton}>URLをコピー</button>
               <TextCopied className={copied ? "show" : ""}>☑ クリップボードにURLをコピーしました！</TextCopied>
-            </p>
+            </CopyButtonWrapper>
           </Body>
         ) : null}
       </Container>
@@ -158,25 +162,55 @@ const Container = styled.div`
 `;
 
 const H1 = styled.h1`
+  margin: 0;
   padding: 10px;
   color: #fff;
+`;
+
+const Body = styled.main`
+  margin: 0px;
+  padding: 5px 10px 0;
+  background-color: #fff;
+  border: 1px solid #1d98f0;
+  display: flex;
+  flex-direction: column;
+`;
+
+const FormItem = styled.p`
+  width: 100%;
+  height: 40px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const Text = styled.span`
   display: inline-block;
   width: 250px;
   text-align: left;
-  ::after {
-    border-right: 1px solid #000;
+  font-size: 20px;
+`;
+
+const Hash = styled.span`
+  margin-left: auto;
+  ::before {
+    display: inline-block;
+    content: "#";
+    font-size: 1.2em;
   }
 `;
 
-const Article = styled.article``;
+const SmallText = styled.span`
+  display: inline-block;
+  vertical-align: middle;
+  font-size: small;
+  color: #6f6f6f;
+`;
 
-const Body = styled.main`
-  margin: 0px;
-  background-color: #fff;
-  border: 1px solid #1d98f0;
+const CopyButtonWrapper = styled.div`
+  margin: 5px 0 10px;
+  width: 100%;
 `;
 
 const Preview = styled.div`
