@@ -1,4 +1,5 @@
 import { FormEvent, ReactNode, useCallback } from "react";
+import styled from "styled-components";
 
 type Props = {
   children?: ReactNode;
@@ -18,5 +19,10 @@ export const Form = (props: Props) => {
     [props.onChangedValue]
   );
 
-  return <form onChange={onChangeChild}>{props.children}</form>;
+  return <StyledForm onChange={onChangeChild}>{props.children}</StyledForm>;
 };
+
+const StyledForm = styled.form`
+  width: 100%;
+  height: 100%;
+`;
