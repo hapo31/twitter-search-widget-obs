@@ -100,7 +100,7 @@ export default function Index(props: Props) {
               </p>
               <p>
                 <Text>最大取得件数</Text>
-                <NumberInput name="count" />
+                <NumberInput name="count" defaultValue={preference.count} />
               </p>
               <p>
                 <Text>フェードイン秒数</Text>
