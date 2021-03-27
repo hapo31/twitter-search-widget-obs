@@ -107,7 +107,7 @@ export default function Index(props: Props) {
                 <NumberInput name="transition" defaultValue={preference.transition} />
               </p>
               <p>
-                <Text>ツイートの表示更新間隔</Text>
+                <Text>ツイートの表示更新間隔(最低10秒、それ以下を指定しても10秒になります)</Text>
                 <NumberInput name="tweetChangeInterval" defaultValue={preference.tweetChangeInterval} />
               </p>
             </Form>
