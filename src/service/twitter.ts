@@ -1,10 +1,10 @@
 import fetch from "isomorphic-fetch";
-import { SearchResultResponse } from "../../@types/twitter";
+import { Response, SearchResultResponse } from "../../@types/twitter";
 import { QueryString } from "../util/util";
 
-export async function oauth() {
+export async function oauth(): Promise<Response<{ token: string }>> {
   const res = await fetch("/api/oauth");
-  return (await res.json()) as { token: string };
+  return await res.json();
 }
 
 export async function searchTweets(
@@ -14,10 +14,10 @@ export async function searchTweets(
   sinceId?: string,
   until?: Date,
   excludeRT?: boolean
-) {
+): Promise<Response<SearchResultResponse>> {
   const q = QueryString({ token, searchWord, sinceId, until, excludeRT, count });
   const res = await fetch(`/api/search_tweet?${q}`);
 
-  const json = (await res.json()) as SearchResultResponse;
+  const json = await res.json();
   return json;
 }

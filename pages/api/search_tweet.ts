@@ -51,5 +51,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const json = await response.json();
 
-  res.status(200).json(json);
+  if ("errors" in json) {
+    const statusCode = response.status;
+    res.status(statusCode).json({ ...json, statusCode });
+  } else {
+    res.status(200).json(json);
+  }
 };

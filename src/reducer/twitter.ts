@@ -1,9 +1,10 @@
-import { STORE_TOKEN, STORE_TWEETS, TwitterActions, UPDATE_LAST_SEARCH_DATE } from "../actions/twitter";
+import { ERROR_ACCRUED, STORE_TOKEN, STORE_TWEETS, TwitterActions, UPDATE_LAST_SEARCH_DATE } from "../actions/twitter";
 import { TwitterState } from "../store/twitter";
 
 const initialState: TwitterState = {
   tweets: [],
   token: null,
+  errors: [],
 };
 
 export function twitterReducer(state = initialState, action: TwitterActions): TwitterState {
@@ -31,6 +32,19 @@ export function twitterReducer(state = initialState, action: TwitterActions): Tw
       return {
         ...state,
         lastSearchDate: action.payload.date,
+      };
+    }
+
+    case ERROR_ACCRUED: {
+      return {
+        ...state,
+        errors: [
+          ...state.errors,
+          {
+            errorCode: action.payload.errorCode,
+            message: action.payload.message,
+          },
+        ],
       };
     }
   }

@@ -56,7 +56,7 @@ export const TwitterSearch = (props: Props) => {
 
 const Container = styled.main`
   background-color: white;
-  width: 98vw;
+  width: 100%;
   height: 200px;
   border: solid 3px #1d98f0;
   border-top-left-radius: 90px;
