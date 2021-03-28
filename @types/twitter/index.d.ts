@@ -1,6 +1,27 @@
-export type Oauth2ResultResponse = {
+export type Response<T> = TwitterErrorResponse | T;
+
+export type OAuth2ResultResponse = {
   token_type: "bearer";
   access_token: string;
+};
+
+export type TwitterErrorResponse = {
+  errors: TwitterError[];
+  request: {
+    params: {
+      [k in key]: string;
+    };
+  };
+
+  statusCode: number;
+};
+
+export type TwitterError = {
+  parameter: string;
+  details: string;
+  code: string;
+  value: string;
+  message: string;
 };
 
 // JSON から機械的に変換したやつだからクッソ汚い

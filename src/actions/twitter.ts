@@ -1,12 +1,16 @@
 import { ThunkAction } from "redux-thunk";
+import { ERRORS } from "../constants/error";
 import { oauth, searchTweets as reqSearchTweets } from "../service/twitter";
 import { RootState } from "../store/root";
 import { Tweet } from "../store/twitter";
+import { convertError } from "../util/error";
 
 type TwitterThunkAction = ThunkAction<void, RootState, void, TwitterActions>;
 
 export const STORE_TOKEN = "TWITTER/STORE_TOKEN" as const;
 export const STORE_TWEETS = "TWITTER/STORE_TWEETS" as const;
+
+export const ERROR_ACCRUED = "TWITTER/ERROR_ACCRUED" as const;
 
 export const UPDATE_LAST_SEARCH_DATE = "TWITTER/UPDATE_LAST_SEARCH_DATE" as const;
 
@@ -18,8 +22,12 @@ export const storeToken = (token: string) => ({
 export const appAuthThunk = (): TwitterThunkAction => {
   return async (dispatch) => {
     const res = await oauth();
-
-    dispatch(storeToken(res.token));
+    if ("errors" in res) {
+      const err = convertError(res.errors[0]);
+      dispatch(errorAccrued(err, res.errors[0].message));
+    } else {
+      dispatch(storeToken(res.token));
+    }
   };
 };
 
@@ -27,6 +35,14 @@ export const updateLastSearchDate = (date: Date) => ({
   type: UPDATE_LAST_SEARCH_DATE,
   payload: {
     date,
+  },
+});
+
+export const errorAccrued = (errorCode: ERRORS, message: string) => ({
+  type: ERROR_ACCRUED,
+  payload: {
+    errorCode,
+    message,
   },
 });
 
@@ -56,6 +72,14 @@ export const searchTweetsThunk = (
     }
 
     const res = await reqSearchTweets(token, searchWord, count, state.sinceId, until, excludeRT);
+    if ("errors" in res) {
+      for (const error of res.errors) {
+        const err = convertError(error);
+        dispatch(errorAccrued(err, error.message));
+      }
+      console.error(`error accrued:${JSON.stringify(res.errors, null, " ")}`);
+      return;
+    }
     if (res.statuses.length === 0) {
       dispatch(updateLastSearchDate(new Date()));
       console.log("tweets not found");
@@ -83,4 +107,6 @@ export const searchTweetsThunk = (
   };
 };
 
-export type TwitterActions = ReturnType<typeof storeToken | typeof storeTweets | typeof updateLastSearchDate>;
+export type TwitterActions = ReturnType<
+  typeof storeToken | typeof storeTweets | typeof updateLastSearchDate | typeof errorAccrued
+>;

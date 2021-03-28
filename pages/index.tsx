@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
+import { TwitterError } from "../@types/twitter";
 import { Form } from "../src/components/atom/Form";
 import { NumberInput } from "../src/components/molecules/NumberInput";
 import { TextInput } from "../src/components/molecules/TextInput";
@@ -22,6 +23,7 @@ type Preference = {
 export default function Index(props: Props) {
   const [preference, setPreference] = useState<Preference>({} as any);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<TwitterError | null>(null);
   const [firstView, setFirstView] = useState(true);
   const [showTweet, setShowTweet] = useState({
     createdAt: new Date(),
@@ -53,9 +55,20 @@ export default function Index(props: Props) {
     const word = encodeURI(preference.searchWord);
     let newPreference = preference;
     if (!preference.token) {
-      const { token } = await oauth();
-      newPreference = { ...preference, token };
-      setPreference(newPreference);
+      const res = await oauth();
+      if ("errors" in res) {
+        if (res.errors.length > 0) {
+          setError(res.errors[0]);
+          return;
+        } else {
+          console.error(res);
+        }
+      } else {
+        const { token } = res;
+        newPreference = { ...preference, token };
+        setError(null);
+        setPreference(newPreference);
+      }
     }
     const url = `https://${location.host}/widget/${word}?${QueryString({
       count: newPreference.count,
@@ -146,6 +159,7 @@ export default function Index(props: Props) {
             <CopyButtonWrapper>
               <button onClick={onClickButton}>URLをコピー</button>
               <TextCopied className={copied ? "show" : ""}>☑ クリップボードにURLをコピーしました！</TextCopied>
+              {error != null ? <ErrorMessage>エラーが発生しました: {error.message}</ErrorMessage> : null}
             </CopyButtonWrapper>
           </Body>
         ) : null}
@@ -227,4 +241,9 @@ const TextCopied = styled.span`
   &.show {
     visibility: visible;
   }
+`;
+
+const ErrorMessage = styled.div`
+  color: red;
+  font-weight: bold;
 `;

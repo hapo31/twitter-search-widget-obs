@@ -1,3 +1,5 @@
+import { ERRORS } from "../constants/error";
+
 export type Tweet = {
   text: string;
   name: string;
@@ -12,4 +14,8 @@ export type TwitterState = {
   sinceId?: string;
   tweets: Tweet[];
   lastSearchDate?: Date;
+  errors: {
+    errorCode: ERRORS;
+    message: string;
+  }[];
 };
