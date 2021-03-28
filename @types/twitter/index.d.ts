@@ -25,6 +25,7 @@ export type TwitterError = {
 };
 
 // JSON から機械的に変換したやつだからクッソ汚い
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 interface Hashtag {
   text: string;
