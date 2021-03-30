@@ -151,8 +151,9 @@ export default function Index(props: Props) {
                 <NumberInput name="transition" defaultValue={preference.transition} />
               </FormItem>
               <FormItem>
-                <Text>ツイートの表示更新間隔</Text>
-                <SmallText>(最低10秒、それ以下を指定しても10秒になります)</SmallText>
+                <Text>
+                  ツイートの表示更新間隔<SmallText>(最低10秒、それ以下を指定しても10秒になります)</SmallText>
+                </Text>
                 <NumberInput name="tweetChangeInterval" defaultValue={preference.tweetChangeInterval} />
               </FormItem>
             </Form>
@@ -192,7 +193,6 @@ const Body = styled.main`
 
 const FormItem = styled.p`
   width: 100%;
-  height: 40px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -201,9 +201,9 @@ const FormItem = styled.p`
 
 const Text = styled.span`
   display: inline-block;
-  width: 250px;
+  max-width: 70%;
   text-align: left;
-  font-size: 20px;
+  font-size: 16px;
 `;
 
 const Hash = styled.span`
@@ -218,6 +218,7 @@ const Hash = styled.span`
 const SmallText = styled.span`
   display: inline-block;
   vertical-align: middle;
+  margin-right: auto;
   font-size: small;
   color: #6f6f6f;
 `;
@@ -235,7 +236,10 @@ const Preview = styled.div`
 `;
 
 const TextCopied = styled.span`
+  display: inline-block;
+  margin-left: 10px;
   color: #009c2f;
+  font-size: 14px;
   transition: 3s;
   visibility: hidden;
   &.show {
